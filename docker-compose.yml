@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: entangled-postgres
+    environment:
+      POSTGRES_DB: mastodon
+      POSTGRES_USER: mastodon
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mastodon"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: entangled-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mastodon:
+    build: .
+    container_name: entangled-mastodon
+    env_file:
+      - .env.local
+    environment:
+      # Fly.io-style URLs for consistency
+      DATABASE_URL: postgresql://mastodon:password@postgres:5432/mastodon
+      REDIS_URL: redis://redis:6379
+
+      # Domain configuration
+      LOCAL_DOMAIN: localhost
+      WEB_DOMAIN: localhost
+      
+      # Optional: Single user mode for testing
+      # SINGLE_USER_MODE: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    container_name: entangled-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - mastodon
+    command: >
+      sh -c "
+        apk add --no-cache openssl &&
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/localhost.key -out /tmp/localhost.crt -subj '/C=US/ST=Local/L=Local/O=Local/OU=Local/CN=localhost' -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1' &&
+        nginx -g 'daemon off;'
+      "
+
+volumes:
+  postgres_data:
