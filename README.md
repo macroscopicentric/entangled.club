@@ -41,7 +41,33 @@ docker-compose down -v
 ```
 
 ## Fly.io Deployment
-TODO
+
+### Prerequisites
+Before deploying to fly, you'll want to create new hosted Postgres + Redis clusters and then save their DB urls as secrets.
+
+> [!IMPORTANT]
+> Fun fact! Managed Postgres has more limited region options than apps or managed redis through Upstash. Create that first and figure out what region you want, and then deploy your app and Redis correspondingly.
+
+You'll also need to generate and commit the rest of the required secrets:
+
+Generate encryption keys:
+```bash
+docker run --rm ghcr.io/glitch-soc/mastodon:latest bundle exec rails db:encryption:init
+```
+Save each of the three keys you get back as secrets in fly (`fly secrets set KEY_NAME=your_key`).
+
+Generate VAPID keys:
+```bash
+docker run --rm ghcr.io/glitch-soc/mastodon:latest bundle exec rails mastodon:webpush:generate_vapid_key
+```
+
+Set all secrets:
+```bash
+fly secrets set SECRET_KEY_BASE=$(openssl rand -hex 64)
+fly secrets set OTP_SECRET=$(openssl rand -hex 64)
+fly secrets set VAPID_PRIVATE_KEY=your_generated_private_key
+fly secrets set VAPID_PUBLIC_KEY=your_generated_public_key
+```
 
 ## Environment Variables
 

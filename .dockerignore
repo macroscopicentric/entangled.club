@@ -1,0 +1,7 @@
+# flyctl launch added from .gitignore
+# Local environment secrets
+**/.env.local
+
+# Docker volumes
+**/postgres_data
+fly.toml
