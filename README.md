@@ -16,11 +16,14 @@ The easiest way to run Entangled Club locally with HTTPS support:
 cp .env.local.example .env.local
 
 # 2. Generate secrets and add them to .env.local
-echo "SECRET_KEY_BASE=$(openssl rand -hex 64)" >> .env.local
-echo "OTP_SECRET=$(openssl rand -hex 64)" >> .env.local
+echo "SECRET_KEY_BASE=$(openssl rand -hex 64)"
+echo "OTP_SECRET=$(openssl rand -hex 64)"
 
-# 3. Generate VAPID keys and add them manually to .env.local
+# 3. Generate VAPID keys and add them to .env.local
 docker run --rm ghcr.io/glitch-soc/mastodon:latest bundle exec rails mastodon:webpush:generate_vapid_key
+
+# 4. Generate encryption keys and add them to .env.local
+docker run --rm ghcr.io/glitch-soc/mastodon:latest bundle exec rails db:encryption:init
 
 # 4. Start all services
 docker-compose up --build
