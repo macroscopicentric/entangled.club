@@ -10,8 +10,8 @@ primary_region = 'ord'
 
 [env]
   # Domain configuration
-  LOCAL_DOMAIN = "entangled-club.fly.dev"
-  WEB_DOMAIN = "entangled-club.fly.dev"
+  LOCAL_DOMAIN = "entangled.club"
+  WEB_DOMAIN = "entangled.club"
   # Force server binding
   RAILS_BIND = "0.0.0.0"
   SERVER_HOST = "0.0.0.0"
