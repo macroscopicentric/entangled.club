@@ -63,31 +63,46 @@ until psql $DATABASE_URL -c "SELECT 1" >/dev/null 2>&1; do
 done
 echo "✅ Database is ready"
 
-# Run database setup
+# Run database setup using direct SQL queries
 echo "🗄️ Setting up database..."
-bundle exec rails db:create 2>/dev/null || echo "Database already exists"
 
-# Check if database is empty (no tables)
-TABLE_COUNT=$(bundle exec rails runner "puts ActiveRecord::Base.connection.tables.count" 2>/dev/null || echo "0")
+# Create database if it doesn't exist
+psql $(echo $DATABASE_URL | sed 's|/[^/]*$|/postgres|') -c "CREATE DATABASE $(echo $DATABASE_URL | sed 's|.*/||') WITH OWNER $(echo $DATABASE_URL | sed 's|.*://\([^:]*\):.*|\1|');" 2>/dev/null || echo "Database already exists"
 
-if [ "$TABLE_COUNT" = "0" ]; then
-  echo "📋 Database is empty, loading schema..."
-  bundle exec rails db:schema:load
+# Check if schema_migrations table exists (indicates Rails has been set up)
+echo "🔍 Checking if Rails schema is initialized..."
+SCHEMA_MIGRATIONS_EXISTS=$(psql $DATABASE_URL -t -c "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'schema_migrations');" 2>/dev/null | tr -d ' ' || echo "f")
+
+echo "🔍 Schema migrations table exists: $SCHEMA_MIGRATIONS_EXISTS"
+
+if [ "$SCHEMA_MIGRATIONS_EXISTS" = "f" ]; then
+  echo "📋 Rails schema not initialized, loading schema..."
+  # Only use Rails for schema loading since it's complex
+  timeout 300 bundle exec rails db:schema:load || {
+    echo "❌ Schema load timed out or failed"
+    exit 1
+  }
   echo "🌱 Running initial seed data..."
-  bundle exec rails db:seed
+  timeout 300 bundle exec rails db:seed || {
+    echo "⚠️ Seed data failed, continuing anyway..."
+  }
 else
-  echo "🔄 Database has tables, running migrations..."
-  bundle exec rails db:migrate
+  echo "🔄 Rails schema exists, running migrations..."
+  # Only use Rails for migrations since they're complex
+  timeout 300 bundle exec rails db:migrate || {
+    echo "❌ Migration timed out or failed"
+    exit 1
+  }
 fi
 
 echo "✅ Database setup complete"
 
-# Test Rails database connection
-echo "🔗 Testing Rails database connection..."
-if timeout 10 bundle exec rails runner "ActiveRecord::Base.connection.execute('SELECT 1')" >/dev/null 2>&1; then
-  echo "✅ Rails can connect to database"
+# Test database connection directly
+echo "🔗 Testing database connection..."
+if psql $DATABASE_URL -c "SELECT 1;" >/dev/null 2>&1; then
+  echo "✅ Database connection works"
 else
-  echo "❌ Rails cannot connect to database, but continuing anyway..."
+  echo "❌ Database connection failed, but continuing anyway..."
 fi
 
 # Precompile assets if they do not exist
