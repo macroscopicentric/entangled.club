@@ -12,13 +12,16 @@ primary_region = 'ord'
   # Domain configuration
   LOCAL_DOMAIN = "entangled-club.fly.dev"
   WEB_DOMAIN = "entangled-club.fly.dev"
+  # Force server binding
+  RAILS_BIND = "0.0.0.0"
+  SERVER_HOST = "0.0.0.0"
 
 [http_service]
   internal_port = 3000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [[vm]]
