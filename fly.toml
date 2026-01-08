@@ -9,24 +9,26 @@ primary_region = 'ord'
 [build]
 
 [env]
-  # Domain configuration
+  # Rails config
   LOCAL_DOMAIN = "entangled.club"
   WEB_DOMAIN = "entangled.club"
-  # Force server binding
   RAILS_BIND = "0.0.0.0"
   SERVER_HOST = "0.0.0.0"
-  # Other env vars
   DB_POOL = "25"
   MAX_THREADS = "5"
   RAILS_LOG_LEVEL = "info"
   SIDEKIQ_LOG_LEVEL = "info"
   SIDEKIQ_CONCURRENCY = "10"
+  WEB_CONCURRENCY = "2"
+  # SMTP
   SMTP_DELIVERY_METHOD = "smtp"
   SMTP_FROM_ADDRESS = "noreply@email.entangled.club"
   SMTP_LOGIN = "resend"
   SMTP_PORT = "587"
   SMTP_SERVER = "smtp.resend.com"
-  WEB_CONCURRENCY = "2"
+  # Security settings
+  AUTHORIZED_FETCH = "true"
+  DISALLOW_UNAUTHENTICATED_API_ACCESS = "true"
 
 [http_service]
   internal_port = 3000
