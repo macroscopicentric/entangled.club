@@ -112,8 +112,22 @@ if [ ! -d "public/assets" ] || [ -z "$(ls -A public/assets 2>/dev/null)" ]; then
   echo "✅ Assets precompiled"
 fi
 
-# Start the server
-echo "🚀 Starting Mastodon web server..."
+# Test if bundle exec works at all
+echo "🧪 Testing bundle exec functionality..."
+if timeout 30 bundle exec ruby -e "puts 'Bundle exec works'" 2>/dev/null; then
+  echo "✅ Bundle exec is working"
+else
+  echo "❌ Bundle exec is hanging or broken - this will cause issues"
+  echo "🔍 Checking Ruby/Bundler environment..."
+  echo "Ruby version: $(ruby -v)"
+  echo "Bundler version: $(bundle -v)"
+  echo "Gem environment:"
+  gem env | head -10
+  echo "⚠️ Continuing anyway, but expect issues..."
+fi
+
+# Start both web server and Sidekiq
+echo "🚀 Starting Mastodon services..."
 
 # Determine the correct URLs based on environment
 if [ -n "$FLY_APP_NAME" ]; then
@@ -129,4 +143,48 @@ else
 fi
 
 echo ""
-exec bundle exec rails server -b 0.0.0.0 -p 3000
+
+# Start Sidekiq in background
+echo "🔄 Starting Sidekiq background workers..."
+bundle exec sidekiq &
+SIDEKIQ_PID=$!
+
+# Give Sidekiq a moment to start
+sleep 3
+
+# Check if Sidekiq started successfully
+if kill -0 $SIDEKIQ_PID 2>/dev/null; then
+  echo "✅ Sidekiq started successfully (PID: $SIDEKIQ_PID)"
+else
+  echo "❌ Sidekiq failed to start, continuing with web server only..."
+  SIDEKIQ_PID=""
+fi
+
+# Start web server in background
+echo "🔄 Starting web server..."
+bundle exec rails server -b 0.0.0.0 -p 3000 &
+WEB_PID=$!
+
+# Give web server a moment to start
+sleep 3
+
+# Check if web server started successfully
+if kill -0 $WEB_PID 2>/dev/null; then
+  echo "✅ Web server started successfully (PID: $WEB_PID)"
+else
+  echo "❌ Web server failed to start, exiting..."
+  [ -n "$SIDEKIQ_PID" ] && kill $SIDEKIQ_PID 2>/dev/null
+  exit 1
+fi
+
+# Monitor both processes - wait for web server to exit
+echo "🔍 Monitoring processes..."
+echo "📍 App should be available at https://entangled.club"
+
+# Wait for the web server process (this keeps the container alive)
+wait $WEB_PID
+
+# If we get here, web server died
+echo "❌ Web server died, shutting down..."
+[ -n "$SIDEKIQ_PID" ] && kill $SIDEKIQ_PID 2>/dev/null
+exit 1
