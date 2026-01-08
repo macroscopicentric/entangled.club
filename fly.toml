@@ -20,12 +20,17 @@ primary_region = 'ord'
   SIDEKIQ_LOG_LEVEL = "info"
   SIDEKIQ_CONCURRENCY = "10"
   WEB_CONCURRENCY = "2"
-  # SMTP
+  # SMTP via Resend
   SMTP_DELIVERY_METHOD = "smtp"
   SMTP_FROM_ADDRESS = "noreply@email.entangled.club"
   SMTP_LOGIN = "resend"
   SMTP_PORT = "587"
   SMTP_SERVER = "smtp.resend.com"
+  # Object storage via DO Spaces
+  S3_BUCKET = "entangled-club-media"
+  S3_ENABLED = "true"
+  S3_ENDPOINT = "https://nyc3.digitaloceanspaces.com"
+  S3_REGION = "nyc3"
   # Security settings
   AUTHORIZED_FETCH = "true"
   DISALLOW_UNAUTHENTICATED_API_ACCESS = "true"
