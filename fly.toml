@@ -27,6 +27,7 @@ primary_region = 'ord'
   SMTP_PORT = "587"
   SMTP_SERVER = "smtp.resend.com"
   # Object storage via DO Spaces
+  EXTRA_MEDIA_HOSTS = "nyc3.digitaloceanspaces.com"
   S3_BUCKET = "entangled-club-media"
   S3_ENABLED = "true"
   S3_ENDPOINT = "nyc3.digitaloceanspaces.com"
