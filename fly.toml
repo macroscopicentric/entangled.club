@@ -28,11 +28,10 @@ primary_region = 'ord'
   SMTP_SERVER = "smtp.resend.com"
   # Object storage via Tigris
   EXTRA_MEDIA_HOSTS = "aged-wind-2023.fly.storage.tigris.dev"
+  S3_ALIAS_HOST = "aged-wind-2023.fly.storage.tigris.dev"
   S3_BUCKET = "aged-wind-2023"
   S3_ENABLED = "true"
   S3_ENDPOINT = "https://fly.storage.tigris.dev"
-  S3_HOSTNAME = "fly.storage.tigris.dev"
-  S3_OVERRIDE_PATH_STYLE = "false"
   S3_REGION = "auto"
   # Security settings
   AUTHORIZED_FETCH = "true"
