@@ -26,15 +26,14 @@ primary_region = 'ord'
   SMTP_LOGIN = "resend"
   SMTP_PORT = "587"
   SMTP_SERVER = "smtp.resend.com"
-  # Object storage via DO Spaces
-  EXTRA_MEDIA_HOSTS = "nyc3.digitaloceanspaces.com"
-  S3_BUCKET = "entangled-club-media"
+  # Object storage via Tigris
+  EXTRA_MEDIA_HOSTS = "aged-wind-2023.fly.storage.tigris.dev"
+  S3_BUCKET = "aged-wind-2023"
   S3_ENABLED = "true"
-  S3_ENDPOINT = "nyc3.digitaloceanspaces.com"
-  S3_FORCE_SINGLE_REQUEST = "true"
-  S3_HOSTNAME = "nyc3.digitaloceanspaces.com"
-  S3_OVERRIDE_PATH_STYLE = "true"
-  S3_REGION = "nyc3"
+  S3_ENDPOINT = "https://fly.storage.tigris.dev"
+  S3_HOSTNAME = "fly.storage.tigris.dev"
+  S3_OVERRIDE_PATH_STYLE = "false"
+  S3_REGION = "auto"
   # Security settings
   AUTHORIZED_FETCH = "true"
   DISALLOW_UNAUTHENTICATED_API_ACCESS = "true"
