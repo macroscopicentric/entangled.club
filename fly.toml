@@ -10,16 +10,18 @@ primary_region = "ord"
 
 [env]
   # Rails config
-  LOCAL_DOMAIN = "entangled.club"
-  WEB_DOMAIN = "entangled.club"
-  RAILS_BIND = "0.0.0.0"
-  SERVER_HOST = "0.0.0.0"
   DB_POOL = "10"
+  DISABLE_SPRING = "1"
+  LOCAL_DOMAIN = "entangled.club"
   MAX_THREADS = "5"
+  RAILS_BIND = "0.0.0.0"
   RAILS_LOG_LEVEL = "info"
-  SIDEKIQ_LOG_LEVEL = "info"
+  RAILS_SKIP_ASSET_COMPILATION = "true"
+  SERVER_HOST = "0.0.0.0"
   SIDEKIQ_CONCURRENCY = "10"
+  SIDEKIQ_LOG_LEVEL = "info"
   WEB_CONCURRENCY = "2"
+  WEB_DOMAIN = "entangled.club"
   # SMTP via Resend
   SMTP_DELIVERY_METHOD = "smtp"
   SMTP_FROM_ADDRESS = "noreply@email.entangled.club"
