@@ -242,8 +242,9 @@ fi
 echo "🔍 Waiting for streaming server to be ready..."
 STREAMING_READY=false
 for i in {1..30}; do
-  if curl -s http://127.0.0.1:4000 >/dev/null 2>&1; then
-    echo "✅ Streaming server is responding on port 4000"
+  # Check if streaming server is listening on port 4000 instead of making HTTP requests
+  if ss -tlnp | grep -q ":4000 "; then
+    echo "✅ Streaming server is listening on port 4000"
     STREAMING_READY=true
     break
   fi
