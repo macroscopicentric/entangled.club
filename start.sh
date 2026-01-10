@@ -205,7 +205,7 @@ fi
 
 # Start web server in background
 echo "🔄 Starting web server..."
-bundle exec rails server -b 127.0.0.1 -p 3000 &
+bundle exec rails server -b 0.0.0.0 -p 3000 &
 WEB_PID=$!
 
 # Give web server a moment to start

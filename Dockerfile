@@ -40,9 +40,6 @@ COPY start.sh /usr/local/bin/start.sh
 # Copy .env.local if it exists (for local development)
 COPY .env.local* /opt/mastodon/
 
-# Copy .env.local if it exists (for local development)
-COPY .env.local* /opt/mastodon/
-
 RUN chmod +x /usr/local/bin/start.sh
 
 # Switch back to mastodon user
