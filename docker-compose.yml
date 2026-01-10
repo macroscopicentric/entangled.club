@@ -31,6 +31,8 @@ services:
   mastodon:
     build: .
     container_name: entangled-mastodon
+    ports:
+      - "80:8080"
     env_file:
       - .env.local
     environment:
@@ -42,6 +44,9 @@ services:
       LOCAL_DOMAIN: localhost
       WEB_DOMAIN: localhost
 
+      # Explicit local development flag
+      LOCAL_DEV: "true"
+
       # Optional: Single user mode for testing
       # SINGLE_USER_MODE: true
     depends_on:
@@ -50,22 +55,7 @@ services:
       redis:
         condition: service_healthy
 
-  nginx:
-    image: nginx:alpine
-    container_name: entangled-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - mastodon
-    command: >
-      sh -c "
-        apk add --no-cache openssl &&
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/localhost.key -out /tmp/localhost.crt -subj '/C=US/ST=Local/L=Local/O=Local/OU=Local/CN=localhost' -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1' &&
-        nginx -g 'daemon off;'
-      "
+
 
 volumes:
   postgres_data:
